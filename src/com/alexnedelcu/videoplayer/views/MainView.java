@@ -1,3 +1,4 @@
+package com.alexnedelcu.videoplayer.views;
 import java.awt.Container;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
@@ -19,31 +20,37 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import com.alexnedelcu.videoplayer.controllers.CtrlEnterNewSource;
+import com.alexnedelcu.videoplayer.controllers.CtrlSearch;
 
-public class Renderer {
 
-	public static JFrame window;
+public class MainView extends JFrame {
+
+	public static MainView window;
 	private static Container panel;
 	private static Container rightPanel;
 	private static Container leftPanel;
 	private static Container rightTopPanel;
 	private static Container rightBottomPanel;
-	private static Renderer instance;
+	private static JComboBox currentSources;
 	
+	public MainView() {
+		window = this;
+	}
 	
 	public void display() {
 		initializeWindow();
 	}
-	
-	
 
-	public static void initializeWindow() {
-
+	/*
+	 * Create split the window in 3 main areas: leftPanel, rightTopPanel, rightBottomPanel.
+	 * The leftPanel stays fixed - does not resize horizontally while the window is resized.
+	 */
+	public void initializeWindow() {
         EventQueue.invokeLater(new Runnable() {
         
             @Override
             public void run() {
-            	window = new JFrame();
                 window.setTitle("Video News Player");
                 window.setSize(600, 600);
                 window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -92,19 +99,7 @@ public class Renderer {
         		cstrMainPane.gridx=1;
         		cstrMainPane.weightx=1;
                 panel.add(rightPanel, cstrMainPane);
-
-//                JLabel leftSide = new JLabel();
-//                leftSide.setText("Left side");
-//                leftPanel.add(leftSide);
-//
-//                JLabel rightTopSide = new JLabel();
-//                rightTopSide.setText("Right top side");
-//                rightTopPane.add(rightTopSide);
-//
-//                JLabel rightBottomSide = new JLabel();
-//                rightBottomSide.setText("Right bottom side");
-//                rightBottomPane.add(rightBottomSide);
-                
+        
                 initializeRightMenu();
                 
                 window.setVisible(true);
@@ -112,13 +107,21 @@ public class Renderer {
         });
 	}
 	
+	/*
+	 * Initialize the right menu: 
+	 * 	buttons:
+	 * 		- enter new source
+	 * 		- use source
+	 * 		- remove source
+	 * 	text input:
+	 * 		- search topic
+	 */
 	public static void initializeRightMenu() {
 		leftPanel.setLayout(new GridBagLayout());
 		
 		/*
 		 * Creating the grid bag contraints
 		 */
-
 		GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;			//maximum width
         c.anchor=GridBagConstraints.FIRST_LINE_START;
@@ -135,13 +138,20 @@ public class Renderer {
          */
 		JButton btnEnterNewSource = new JButton();
 		btnEnterNewSource.setText("Enter new source");
+		btnEnterNewSource.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent a) {
+				new CtrlEnterNewSource().handleMainViewEnterButtonPressed(a);
+			}
+		});
 		leftPanel.add(btnEnterNewSource, c);
+		
 		
 		/*
 		 * Adding the drop down select
 		 */
         c.gridy=1;
-        JComboBox currentSources = new JComboBox();
+        currentSources = new JComboBox();
         leftPanel.add(currentSources, c);
 		
 		/*
@@ -184,20 +194,38 @@ public class Renderer {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+				new CtrlSearch().handleAction(e);
 			}
 		});
         leftPanel.add(txtSearch, c);
-        
-        
 	}
 
 
+	/*
+	 * Singleton pattern
+	 */
+	public static MainView getInstance() {
+		if(window == null) window = new MainView();
+		
+		return window;
+	}
 
-	public static Renderer getInstance() {
-		if (instance == null)
-			instance  = new Renderer();
-		return instance;
+	public void addAvailableSource(String name, String url) {
+		currentSources.addItem(name);
+	}
+
+	public void removeAvailableSource(String name, String url) {
+		currentSources.removeItem(name);
+	}
+
+	public void addSelectedSource(String name, String url) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void removeSelectedSource(String name, String url) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }
