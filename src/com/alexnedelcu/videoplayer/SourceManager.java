@@ -50,8 +50,7 @@ public class SourceManager {
 		return null;
 	}
 
-	public void addSelectedSource(Source s){
-		availableSources.remove(s);
+	public void addSelectedSource(Source s) {
 		selectedSources.add(s);
 		
 		// add the source to the MainView
@@ -59,7 +58,6 @@ public class SourceManager {
 	}
 	public void removeSelectedSource(Source s) {
 		availableSources.add(s);
-		selectedSources.remove(s);
 		
 		// add the source to the MainView
 		MainView.getInstance().removeSelectedSource(s.getName(), s.getUrl());

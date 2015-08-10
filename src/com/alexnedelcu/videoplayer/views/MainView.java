@@ -1,4 +1,5 @@
 package com.alexnedelcu.videoplayer.views;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
@@ -7,8 +8,14 @@ import java.awt.GridBagLayout;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -21,7 +28,9 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import com.alexnedelcu.videoplayer.controllers.CtrlEnterNewSource;
+import com.alexnedelcu.videoplayer.controllers.CtrlRemoveAvailableSource;
 import com.alexnedelcu.videoplayer.controllers.CtrlSearch;
+import com.alexnedelcu.videoplayer.controllers.CtrlSelectSource;
 
 
 public class MainView extends JFrame {
@@ -32,7 +41,9 @@ public class MainView extends JFrame {
 	private static Container leftPanel;
 	private static Container rightTopPanel;
 	private static Container rightBottomPanel;
+	private static Container pnlSelectedSource;
 	private static JComboBox currentSources;
+	private static JScrollPane scrSourceArea;
 	
 	public MainView() {
 		window = this;
@@ -161,6 +172,14 @@ public class MainView extends JFrame {
         c.gridy=2;
 		JButton btnUseSource = new JButton();
 		btnUseSource.setText("Use source");
+		btnUseSource.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new CtrlSelectSource().selectSource((String) currentSources.getSelectedItem());
+			}
+			
+		});
 		leftPanel.add(btnUseSource, c);
 		
 		/*
@@ -169,6 +188,12 @@ public class MainView extends JFrame {
         c.gridx=1;
         JButton btnRemoveSource = new JButton();
         btnRemoveSource.setText("Remove source");
+        btnRemoveSource.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				new CtrlRemoveAvailableSource().removeSrc((String) currentSources.getSelectedItem());
+			}
+        });
         leftPanel.add(btnRemoveSource, c);
         
 		/*
@@ -178,9 +203,12 @@ public class MainView extends JFrame {
         c.gridy=3;
         c.gridwidth=2;
         c.weighty=1;
-		JScrollPane scrSourceArea = new JScrollPane();
-		scrSourceArea.add(new Panel());
-		leftPanel.add(scrSourceArea, c);
+		scrSourceArea = new JScrollPane();
+		pnlSelectedSource = new Panel();
+		pnlSelectedSource.setLayout(new GridBagLayout());
+//		scrSourceArea.setLayout(new GridBagLayout());
+//		scrSourceArea.add(pnlSelectedSource);
+		leftPanel.add(pnlSelectedSource, c);
         
 		/*
 		 * Adding the Search text box
@@ -194,7 +222,7 @@ public class MainView extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				new CtrlSearch().handleAction(e);
+				new CtrlSearch().search(e);
 			}
 		});
         leftPanel.add(txtSearch, c);
@@ -218,13 +246,67 @@ public class MainView extends JFrame {
 		currentSources.removeItem(name);
 	}
 
-	public void addSelectedSource(String name, String url) {
-		// TODO Auto-generated method stub
+	int numSelectedSources=0;
+	public void addSelectedSource(final String name, String url) {
+		GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.BOTH;
+        c.anchor=GridBagConstraints.FIRST_LINE_START;
+        c.gridheight=1;
+        c.gridwidth=1;
+        c.gridx=0;
+        c.gridy=numSelectedSources;
+        c.weightx=0;
+        c.weighty=0;
+        
+        /*
+         * add the remove button
+         */
+        JButton btnRemoveSrc;
+		try {
+	        BufferedImage buttonIcon;
+			buttonIcon = ImageIO.read(new File("res/16x16-black-white-metro-delete-icon.png"));
+			btnRemoveSrc = new JButton(new ImageIcon(buttonIcon));
+	        btnRemoveSrc.setBorder(BorderFactory.createEmptyBorder());
+	        btnRemoveSrc.setContentAreaFilled(false);
+		} catch (IOException e) {
+			btnRemoveSrc = new JButton("x");
+			e.printStackTrace();
+		}
+		btnRemoveSrc.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				new CtrlSelectSource().unselectSource(name);
+			}
+		});
+
+        pnlSelectedSource.add(btnRemoveSrc, c);
 		
+        /*
+         *  add the source name
+         */
+        JLabel source = new JLabel(name);
+        c.gridx=1;
+        pnlSelectedSource.add(source, c);
+  
+        window.setVisible(true);
+        
+        numSelectedSources++;
 	}
 
 	public void removeSelectedSource(String name, String url) {
-		// TODO Auto-generated method stub
+		for (int i=0; i<pnlSelectedSource.getComponentCount(); i++) {
+			Component c = pnlSelectedSource.getComponent(i);
+			String classname = c.getClass().getSimpleName();
+			classname.length();
+			if (classname.equals("JLabel"))
+				if (((JLabel)c).getText().equals(name)) {
+					pnlSelectedSource.remove(i);
+					pnlSelectedSource.remove(i-1);
+				}
+		}
+		
+        pnlSelectedSource.setVisible(false);
+        pnlSelectedSource.setVisible(true);
 		
 	}
 	
