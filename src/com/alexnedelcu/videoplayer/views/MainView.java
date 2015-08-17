@@ -1,31 +1,38 @@
 package com.alexnedelcu.videoplayer.views;
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
+
+import chrriis.common.UIUtils;
+import chrriis.dj.nativeswing.NativeSwing;
+import chrriis.dj.nativeswing.swtimpl.NativeInterface;
+import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser;
 
 import com.alexnedelcu.videoplayer.controllers.CtrlEnterNewSource;
 import com.alexnedelcu.videoplayer.controllers.CtrlRemoveAvailableSource;
@@ -37,11 +44,11 @@ public class MainView extends JFrame {
 
 	public static MainView window;
 	private static Container panel;
-	private static Container rightPanel;
-	private static Container leftPanel;
-	private static Container rightTopPanel;
-	private static Container rightBottomPanel;
-	private static Container pnlSelectedSource;
+	private static JPanel rightPanel;
+	private static JPanel leftPanel;
+	private static JPanel rightTopPanel;
+	private static JPanel rightBottomPanel;
+	private static JPanel pnlSelectedSource;
 	private static JComboBox currentSources;
 	private static JScrollPane scrSourceArea;
 	
@@ -58,7 +65,13 @@ public class MainView extends JFrame {
 	 * The leftPanel stays fixed - does not resize horizontally while the window is resized.
 	 */
 	public void initializeWindow() {
-        EventQueue.invokeLater(new Runnable() {
+
+		NativeSwing.initialize();
+	    NativeInterface.open();
+	    UIUtils.setPreferredLookAndFeel();
+	    
+	    EventQueue.invokeLater(new Runnable() {
+//	    SwingUtilities.invokeLater(new Runnable() {
         
             @Override
             public void run() {
@@ -69,13 +82,13 @@ public class MainView extends JFrame {
                 panel = window.getContentPane();
                 panel.setLayout(new GridBagLayout());
 
-                leftPanel = new Panel();
-                rightPanel = new Panel();
+                leftPanel = new JPanel();
+                rightPanel = new JPanel();
 
                 rightPanel.setLayout(new GridBagLayout());
 
-                Container rightTopPane = new Panel();
-                Container rightBottomPane = new Panel();
+                rightTopPanel = new JPanel();
+                rightBottomPanel = new JPanel();
 
         		GridBagConstraints cstrRightPane = new GridBagConstraints();
                 cstrRightPane.fill = GridBagConstraints.BOTH;			//maximum width
@@ -87,13 +100,13 @@ public class MainView extends JFrame {
                 cstrRightPane.weightx=1;
                 cstrRightPane.weighty=1;
                 
-                rightPanel.add(rightTopPane, cstrRightPane);
+                rightPanel.add(rightTopPanel, cstrRightPane);
                 
                 cstrRightPane.weightx=0;
                 cstrRightPane.weighty=0;
                 cstrRightPane.gridy=1;
                 
-                rightPanel.add(rightBottomPane, cstrRightPane);
+                rightPanel.add(rightBottomPanel, cstrRightPane);
 
 
         		GridBagConstraints cstrMainPane = new GridBagConstraints();
@@ -111,11 +124,14 @@ public class MainView extends JFrame {
         		cstrMainPane.weightx=1;
                 panel.add(rightPanel, cstrMainPane);
         
-                initializeRightMenu();
+                initializeLeftMenu();
+                initializeRightBottomPanel();
+                initializeRightTopPanel();
                 
                 window.setVisible(true);
             }
         });
+	    NativeInterface.runEventPump();
 	}
 	
 	/*
@@ -127,7 +143,7 @@ public class MainView extends JFrame {
 	 * 	text input:
 	 * 		- search topic
 	 */
-	public static void initializeRightMenu() {
+	public static void initializeLeftMenu() {
 		leftPanel.setLayout(new GridBagLayout());
 		
 		/*
@@ -204,7 +220,7 @@ public class MainView extends JFrame {
         c.gridwidth=2;
         c.weighty=1;
 		scrSourceArea = new JScrollPane();
-		pnlSelectedSource = new Panel();
+		pnlSelectedSource = new JPanel();
 		pnlSelectedSource.setLayout(new GridBagLayout());
 //		scrSourceArea.setLayout(new GridBagLayout());
 //		scrSourceArea.add(pnlSelectedSource);
@@ -216,18 +232,56 @@ public class MainView extends JFrame {
         c.gridy=4;
         c.weighty=0;
         String initText = "Enter topic...";
-        JTextField txtSearch = new JTextField();
+        final JTextField txtSearch = new JTextField();
         txtSearch.setText(initText);
-        txtSearch.addActionListener(new ActionListener() {
-			
+        txtSearch.addKeyListener(new KeyListener() {
+
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				new CtrlSearch().search(e);
+			public void keyPressed(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				
 			}
-		});
+
+			@Override
+			public void keyReleased(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void keyTyped(KeyEvent arg0) {
+				if(arg0.getKeyChar() == '\n')
+					new CtrlSearch().search(txtSearch, arg0);
+				
+			}
+        	
+        });
         leftPanel.add(txtSearch, c);
 	}
+	
+	public static void initializeRightBottomPanel() {
+		rightBottomPanel.setLayout(new BorderLayout());
+		
+		JLabel label = new JLabel("List of video thumbnails ");
+		
+		JScrollPane videoList = new JScrollPane(label);
+        videoList.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        videoList.setMinimumSize(new Dimension(200, 100));
+		rightBottomPanel.add(videoList);
+	}
+	public static void initializeRightTopPanel() {
+		
+		rightTopPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		rightTopPanel.setLayout(new BorderLayout());
 
+	    final JWebBrowser webBrowser = new JWebBrowser();
+	    webBrowser.setBarsVisible(false);
+	    webBrowser.setMenuBarVisible(false);
+	    webBrowser.navigate("http://www.google.com");
+	    rightTopPanel.add(webBrowser, BorderLayout.CENTER);
+	    
+	}
+	
 
 	/*
 	 * Singleton pattern

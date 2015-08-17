@@ -1,7 +1,6 @@
 package com.alexnedelcu.videoplayer.views;
 
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -13,7 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
-import javax.swing.JWindow;
+import javax.swing.WindowConstants;
 
 import com.alexnedelcu.videoplayer.controllers.CtrlEnterNewSource;
 
@@ -33,7 +32,7 @@ public class NewSourceView extends JFrame implements WindowListener {
 	}
 	
 	public void setupLayout() {
-		window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		window.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		window.setTitle("New Source");
 		window.setResizable(false);
 		window.setSize(500, 100);
