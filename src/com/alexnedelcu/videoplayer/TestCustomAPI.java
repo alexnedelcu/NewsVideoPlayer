@@ -23,7 +23,7 @@ public class TestCustomAPI {
 
 			@Override
 			public void initialize(HttpRequest request) throws IOException {
-
+				
 			}
 		};
 		JsonFactory jsonFactory = new JacksonFactory();

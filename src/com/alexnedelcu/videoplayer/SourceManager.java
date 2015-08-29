@@ -41,13 +41,17 @@ public class SourceManager {
 		return null;
 	}
 	
-	
+
 	public Source getSelectedSourceByName(String name) {
 		for (int i=0; i<selectedSources.size(); i++) {
 			if (selectedSources.get(i).getName().toLowerCase().equals(name.toLowerCase()))
 				return selectedSources.get(i);
 		}
 		return null;
+	}
+
+	public ArrayList<Source> getSelectedSources() {
+		return selectedSources;
 	}
 
 	public void addSelectedSource(Source s) {

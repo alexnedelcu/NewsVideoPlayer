@@ -1,8 +1,10 @@
 package com.alexnedelcu.videoplayer.search;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
+import com.alexnedelcu.videoplayer.SourceManager;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -19,7 +21,7 @@ public class SearchEngine {
 	HttpRequestInitializer httpRequestInitializer;
 	JsonFactory jsonFactory;
 	Customsearch customSearch;
-	List list;
+	
 	
 	public SearchEngine () {
 
@@ -49,7 +51,15 @@ public class SearchEngine {
 			list.setKey(key);
 			
 			result = list.execute();
-			List listResult = (List) result.getItems();
+			List<Result> listResult = (List<Result>) result.getItems();
+			
+			for (int i=0; i<listResult.size(); i++) {
+				NewsArticle na = new NewsArticle();
+				na.setTitle(listResult.get(i).getTitle());
+				na.setUrl(listResult.get(i).getLink());
+				na.load();
+				NewsArticleManager.getInstance().addNewsArticle(na);
+			}
 
 			return listResult;
 		} catch (IOException e) {
