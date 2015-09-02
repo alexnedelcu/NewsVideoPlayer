@@ -29,7 +29,7 @@ public class SearchEngine {
 
 			@Override
 			public void initialize(HttpRequest request) throws IOException {
-
+				
 			}
 		};
 		jsonFactory = new JacksonFactory();
@@ -40,13 +40,15 @@ public class SearchEngine {
 		
 	}
 	
-	public List<Result> search(String term) {
+	public List<NewsArticle> search(String term) {
 
 		Customsearch.Cse.List list;
 		Search result;
+		ArrayList<Thread> loadingThreads = new ArrayList<Thread>();
 		
 		try {
 			list = customSearch.cse().list(term);
+//			list.setNum((long)20);
 			list.setCx(engineID);
 			list.setKey(key);
 			
@@ -57,14 +59,23 @@ public class SearchEngine {
 				NewsArticle na = new NewsArticle();
 				na.setTitle(listResult.get(i).getTitle());
 				na.setUrl(listResult.get(i).getLink());
-				na.load();
+				loadingThreads.add(na.load());
 				NewsArticleManager.getInstance().addNewsArticle(na);
 			}
 
-			return listResult;
+			// Wait until all the threads load all the info about these articles
+			for (int i=0; i<loadingThreads.size(); i++) 
+				loadingThreads.get(i).join();
+			
+			
+			List<NewsArticle> articles = NewsArticleManager.getInstance().getNewsArticles();
+			return articles;
 		} catch (IOException e) {
 			e.printStackTrace();
-			return null;
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		return null;
 	}
 }

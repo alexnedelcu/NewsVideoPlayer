@@ -22,5 +22,18 @@
 	<classpathentry kind="lib" path="jar/org.eclipse.swt.win32.win32.x86_64-4.2.jar"/>
 	<classpathentry kind="lib" path="jar/protobuf-java-2.4.1.jar"/>
 	<classpathentry kind="lib" path="jar/xpp3-1.1.4c.jar"/>
+	<classpathentry kind="lib" path="jar/nekohtml-1.9.13.jar"/>
+	<classpathentry kind="lib" path="jar/xerces-2.9.1.jar"/>
+	<classpathentry kind="lib" path="jar/boilerpipe-javadoc-1.2.0.jar"/>
+	<classpathentry kind="lib" path="jar/boilerpipe-1.2.0.jar"/>
+	<classpathentry kind="lib" path="jar/jsoup-1.8.3.jar"/>
+	<classpathentry kind="lib" path="jar/commons-codec-1.9.jar"/>
+	<classpathentry kind="lib" path="jar/fluent-hc-4.5.jar"/>
+	<classpathentry kind="lib" path="jar/httpclient-4.5.jar"/>
+	<classpathentry kind="lib" path="jar/httpclient-cache-4.5.jar"/>
+	<classpathentry kind="lib" path="jar/httpclient-win-4.5.jar"/>
+	<classpathentry kind="lib" path="jar/httpmime-4.5.jar"/>
+	<classpathentry kind="lib" path="jar/jna-4.1.0.jar"/>
+	<classpathentry kind="lib" path="jar/jna-platform-4.1.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
