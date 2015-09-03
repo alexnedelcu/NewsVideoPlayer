@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -81,7 +82,7 @@ public class MainView extends JFrame {
 	    NativeInterface.open();
 	    UIUtils.setPreferredLookAndFeel();
 	    
-	    EventQueue.invokeLater(new Runnable() {
+	    SwingUtilities.invokeLater(new Runnable() {
 //	    SwingUtilities.invokeLater(new Runnable() {
         
             @Override
@@ -302,7 +303,7 @@ public class MainView extends JFrame {
 		rightBottomPanel.add(videoList);
 	}
 	
-	static JWebBrowser webBrowser;
+	public static JWebBrowser webBrowser;
 	public static void initializeRightTopPanel() {
 		
 		rightTopPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -311,7 +312,7 @@ public class MainView extends JFrame {
 		webBrowser = new JWebBrowser();
 	    webBrowser.setBarsVisible(false);
 	    webBrowser.setMenuBarVisible(false);
-	    webBrowser.navigate("http://www.google.com");
+	    webBrowser.navigate("http://news.google.com");
 	    rightTopPanel.add(webBrowser, BorderLayout.CENTER);
 	    
 	}
@@ -400,9 +401,18 @@ public class MainView extends JFrame {
 	
 	
 	final static double thumbMaxWidth=160.0,  thumbMaxHeight=120.0;
+	ArrayList<JLabel> labels = new ArrayList<JLabel>();
+	static JLabel selectedLabel1=null,  selectedLabel2;
 	public void displaySearchResults() {
-		final List<NewsArticle> news = NewsArticleManager.getInstance().getNewsArticles();
 		
+
+		newsListPanel.removeAll();
+		for(int i=0; i<labels.size(); i++) {
+			newsListPanel.remove(labels.get(i));
+		}
+		
+		final List<NewsArticle> news = NewsArticleManager.getInstance().getNewsArticles();
+
 		GridBagLayout layout = new  GridBagLayout();
 
 		GridBagConstraints c = new GridBagConstraints();
@@ -469,7 +479,7 @@ public class MainView extends JFrame {
 				lbl.setBorder(new EmptyBorder(5,10,15,10));
 				lbl.setHorizontalAlignment(JLabel.CENTER);
 				
-
+				final int k=i;
 		        MouseListener clickAction = new MouseListener() {
 		        	
 		        	boolean isSelected=false;
@@ -500,6 +510,7 @@ public class MainView extends JFrame {
 
 					@Override
 					public void mouseReleased(MouseEvent arg0) {
+						if(selectedLabel1 != null) deselectPreviousNews();
 						lbl.setOpaque(true);
 						label.setOpaque(true);
 						lbl.setBackground(Color.DARK_GRAY);
@@ -507,6 +518,8 @@ public class MainView extends JFrame {
 						lbl.setForeground(Color.WHITE);
 						label.setForeground(Color.WHITE);
 						loadTopRightPane(na);
+						selectedLabel1 = lbl;
+						selectedLabel2 = label;
 						
 					}
 					
@@ -518,6 +531,9 @@ public class MainView extends JFrame {
 				newsListPanel.add(label, c);
 				c.gridy=1;
 				newsListPanel.add(lbl,  c);
+				
+				labels.add(label);
+				labels.add(lbl);
 			}
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
@@ -532,12 +548,24 @@ public class MainView extends JFrame {
 
 	}
 	
+	public void deselectPreviousNews() {
+		selectedLabel1.setBackground(Color.LIGHT_GRAY);
+		selectedLabel2.setBackground(Color.LIGHT_GRAY);
+//		labels.get(selectedLabel).setBackground(Color.GRAY);
+//		labels.get(selectedLabel+1).setBackground(Color.GRAY);
+		window.repaint();
+	}
+	
+	
 	public void showLoadingScreen() {
-		webBrowser.setHTMLContent("<center valign=\"middle\"><img src=\"https://portal.ehawaii.gov/assets/images/loading.gif\"></center>");
-		System.out.println("Progress : "+webBrowser.getLoadingProgress());
+//		webBrowser.setHTMLContent("<center valign=\"middle\"><img src=\"https://portal.ehawaii.gov/assets/images/loading.gif\"></center>");
+//		webBrowser.setHTMLContent("Loading");
+//		System.out.println("Progress : "+webBrowser.getLoadingProgress());
 		
 		
 	}
+	
+	
 	
 	public void hideLoadingScreen() {
 		webBrowser.setHTMLContent("");

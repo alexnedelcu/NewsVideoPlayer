@@ -19,8 +19,11 @@ public class NewsArticleManager {
 		return instance;
 	}
 	
+	public void reset() {
+		list.clear();
+	}
+	
 	public void addNewsArticle (NewsArticle article) {
-//		article.setNewsManager(this;)
 		list.add(article);
 	}
 

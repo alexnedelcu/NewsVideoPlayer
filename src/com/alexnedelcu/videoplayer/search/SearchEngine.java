@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.alexnedelcu.videoplayer.SourceManager;
+import com.alexnedelcu.videoplayer.views.MainView;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -17,13 +18,15 @@ import com.google.api.services.customsearch.model.Search;
 public class SearchEngine {
 	final String key = "AIzaSyAMWIXeB5a6oWb4SFqZJ2--C8JJekRayBI";
 	final String engineID = "005508658984809288923:ypml9ppzazk";
+	SearchEngine instance;
 	
-	HttpRequestInitializer httpRequestInitializer;
-	JsonFactory jsonFactory;
-	Customsearch customSearch;
+	static HttpRequestInitializer httpRequestInitializer;
+	static JsonFactory jsonFactory;
+	static Customsearch customSearch;
 	
 	
 	public SearchEngine () {
+		if (httpRequestInitializer == null) {
 
 		httpRequestInitializer = new HttpRequestInitializer() {
 
@@ -37,6 +40,7 @@ public class SearchEngine {
 		customSearch = new Customsearch(new NetHttpTransport(),
 				jsonFactory, httpRequestInitializer);
 
+		}
 		
 	}
 	
@@ -54,12 +58,19 @@ public class SearchEngine {
 			
 			result = list.execute();
 			List<Result> listResult = (List<Result>) result.getItems();
+
+			if(result.getItems().size() > 0)
+				MainView.getInstance().webBrowser.navigate(listResult.get(0).getLink());
 			
 			for (int i=0; i<listResult.size(); i++) {
+				
+				
 				NewsArticle na = new NewsArticle();
 				na.setTitle(listResult.get(i).getTitle());
 				na.setUrl(listResult.get(i).getLink());
 				loadingThreads.add(na.load());
+				
+				
 				NewsArticleManager.getInstance().addNewsArticle(na);
 			}
 

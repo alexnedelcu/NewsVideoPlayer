@@ -21,7 +21,7 @@ public class CtrlSearch extends Ctrl {
 		
 		ArrayList<Source> sites = SourceManager.getInstance().getSelectedSources();
 		for (int i=0; i<sites.size(); i++) {
-			textToSearch += "site:"+sites.get(i).getUrl();
+			textToSearch += ""+sites.get(i).getUrl();
 			if (sites.size()>1 && i<sites.size()-1) 
 				textToSearch += " OR ";
 			else
